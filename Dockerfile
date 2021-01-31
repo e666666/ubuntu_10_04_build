@@ -33,8 +33,8 @@ RUN /usr/local/openssl/bin/openssl version
 RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslVer}
 
 # Build new Git
-ARG gitVer=2.30.0
 WORKDIR /usr/local
+ARG gitVer=2.30.0
 RUN wget --no-check-certificate https://mirrors.edge.kernel.org/pub/software/scm/git/git-${gitVer}.tar.gz
 RUN tar -xvzf git-${gitVer}.tar.gz
 WORKDIR /usr/local/git-${gitVer}
