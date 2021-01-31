@@ -24,6 +24,7 @@ RUN ldconfig -v
 RUN /usr/local/openssl-bootstrap/bin/openssl version
 
 # Build not-so-new curl in order to talk TLSv1.2
+WORKDIR /usr/local
 ARG bootstrapCurlVer=7.46.0
 # FIXME: Find a more trustable mirror
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
@@ -35,6 +36,7 @@ RUN make install
 RUN curl --version
 
 # Build new OpenSSL (needed for newer git and https to work)
+WORKDIR /usr/local
 ARG opensslVer=1.1.1i
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz
 RUN tar -xvzf openssl-${opensslVer}.tar.gz
@@ -44,6 +46,7 @@ RUN make -j6
 RUN make install
 
 # Build new curl with new OpenSSL for Git
+WORKDIR /usr/local
 ARG curlVer=7.74.0
 RUN curl -o curl-${curlVer}.tar.gz https://curl.se/download/curl-${curlVer}.tar.gz
 
@@ -93,7 +96,7 @@ WORKDIR /wd
 COPY buildScript-specifyBuildTask.patch /buildScript-specifyBuildTask.patch
 RUN patch -i ../buildScript-specifyBuildTask.patch
 COPY buildScript-fixVerboseBuild.patch /buildScript-fixVerboseBuild.patch
-RUN patch -i ../buildScript-fixVerboseBuild.patc
+RUN patch -i ../buildScript-fixVerboseBuild.patch
 
 # Build dat thing
 RUN ./build-lucid-multilib-toolchain.sh --bootstrap --git-date=2014-03-05T13:04:07+0000 --work-dir=/wd --ubuntu-mirror=http://old-releases.ubuntu.com/ --verbose
