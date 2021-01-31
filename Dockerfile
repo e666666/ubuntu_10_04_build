@@ -46,7 +46,7 @@ RUN make install
 RUN git --version
 RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
-# Download new enough curl in order to talk https
+# Build new enough curl in order to talk https
 WORKDIR /usr/local
 ARG bootstrapCurlVer=7.46.0
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
