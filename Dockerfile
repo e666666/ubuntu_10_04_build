@@ -15,21 +15,22 @@ RUN apt-get dist-upgrade -y
 
 # Build new OpenSSL (needed for newer git and https to work)
 WORKDIR /usr/local
-RUN wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz
-RUN wget https://www.openssl.org/source/openssl-1.0.2o.tar.gz.sha1 -O openssl.sha1
-RUN sha1sum openssl-1.0.2o.tar.gz > openssl.tar.gz.calc.sha1
+ARG opensslVer = 1.1.1i
+RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz
+RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz.sha1 -O openssl.sha1
+RUN sha1sum openssl-${opensslVer}.tar.gz > openssl.tar.gz.calc.sha1
 # verify SHA1
 RUN python -c "assert open('openssl.sha1').read().strip() in open('openssl.tar.gz.calc.sha1').read().strip()"
 # Continue with OpenSSL
-RUN tar -xvzf openssl-1.0.2o.tar.gz
-WORKDIR /usr/local/openssl-1.0.2o
+RUN tar -xvzf openssl-${opensslVer}.tar.gz
+WORKDIR /usr/local/openssl-${opensslVer}
 RUN ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
 RUN make -j4
 RUN make install
 RUN echo "/usr/local/openssl/lib" >> /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
 RUN /usr/local/openssl/bin/openssl version
-RUN rm -rf /usr/local/openssl-1.0.2o.tar.gz /usr/local/openssl-1.0.2o
+RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslVer}
 
 # Build new Git
 WORKDIR /usr/local
