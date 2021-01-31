@@ -15,7 +15,7 @@ RUN apt-get dist-upgrade -y
 
 # Build new OpenSSL (needed for newer git and https to work)
 WORKDIR /usr/local
-ARG opensslVer = 1.1.1i
+ARG opensslVer=1.1.1i
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz.sha1 -O openssl.sha1
 RUN sha1sum openssl-${opensslVer}.tar.gz > openssl.tar.gz.calc.sha1
