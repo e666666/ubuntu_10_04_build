@@ -83,14 +83,11 @@ RUN rm -rf /usr/local/curl-${curlVer}.tar.gz curl-${curlVer}
 
 # Download the latest .pem file for https connections via curl
 RUN curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
-# Tell git to use the new certs
-RUN echo "[http]" >> ~/.gitconfig
-RUN echo "sslCAinfo = /cacert.pem" >> ~/.gitconfig
 
 # Build new Git
 WORKDIR /usr/local
 ARG gitVer=2.30.0
-RUN wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-${gitVer}.tar.gz
+RUN curl --cacert /cacert.pem -o git-${gitVer}.tar.gz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${gitVer}.tar.gz
 RUN tar -xvzf git-${gitVer}.tar.gz
 WORKDIR /usr/local/git-${gitVer}
 RUN ./configure --with-openssl=/usr/local/openssl
@@ -98,6 +95,10 @@ RUN make -j4
 RUN make install
 RUN git --version
 RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
+
+# Tell git to use the new certs
+RUN echo "[http]" >> ~/.gitconfig
+RUN echo "sslCAinfo = /cacert.pem" >> ~/.gitconfig
 
 # Spawn shell
 WORKDIR /
