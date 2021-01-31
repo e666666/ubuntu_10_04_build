@@ -13,6 +13,39 @@ RUN apt-get install checkinstall libgnutls-dev curl autoconf libtool -y
 # Upgrade everything
 RUN apt-get dist-upgrade -y
 
+# Build not-so-new OpenSSL in order to build not-so-new curl with TLSv1.2 support
+WORKDIR /usr/local
+ARG bootstrapOpensslVer=1.0.1u
+RUN wget https://www.openssl.org/source/openssl-${bootstrapOpensslVer}.tar.gz
+RUN wget https://www.openssl.org/source/openssl-${bootstrapOpensslVer}.tar.gz.sha1 -O openssl.sha1
+RUN sha1sum openssl-${bootstrapOpensslVer}.tar.gz > openssl.tar.gz.calc.sha1
+# Verify SHA1
+RUN python -c "assert open('openssl.sha1').read().strip() in open('openssl.tar.gz.calc.sha1').read().strip()"
+# Remove SHA1 files
+RUN rm openssl.sha1 openssl.tar.gz.calc.sha1
+# Continue with OpenSSL
+RUN tar -xvzf openssl-${bootstrapOpensslVer}.tar.gz
+WORKDIR /usr/local/openssl-${bootstrapOpensslVer}
+RUN ./config --prefix=/usr/local/openssl-${bootstrapOpensslVer} --openssldir=/usr/local/openssl-${bootstrapOpensslVer} shared zlib
+RUN make -j4
+RUN make install
+RUN echo "/usr/local/openssl-${bootstrapOpensslVer}/lib" > /etc/ld.so.conf.d/openssl.conf
+RUN ldconfig -v
+RUN /usr/local/openssl-${bootstrapOpensslVer}/bin/openssl version
+RUN rm -rf /usr/local/openssl-${bootstrapOpensslVer}.tar.gz /usr/local/openssl-${bootstrapOpensslVer}
+
+# Build not-so-new curl in order to talk TLSv1.2
+WORKDIR /usr/local
+ARG bootstrapCurlVer=7.46.0
+RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
+RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
+WORKDIR /usr/local/curl-${bootstrapCurlVer}
+RUN LIBS="-ldl" ./configure --with-openssl=/usr/local/openssl-${bootstrapOpensslVer} --disable-shared
+RUN make -j4
+RUN make install
+RUN curl --version
+RUN rm -rf /usr/local/curl-${bootstrapCurlVer}.tar.gz curl-${bootstrapCurlVer}
+
 # Build new OpenSSL (needed for newer git and https to work)
 WORKDIR /usr/local
 ARG opensslVer=1.1.1i
@@ -29,34 +62,10 @@ WORKDIR /usr/local/openssl-${opensslVer}
 RUN ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
 RUN make -j4
 RUN make install
-RUN echo "/usr/local/openssl/lib" >> /etc/ld.so.conf.d/openssl.conf
+RUN echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
 RUN /usr/local/openssl/bin/openssl version
 RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslVer}
-
-# Build new Git
-WORKDIR /usr/local
-ARG gitVer=2.30.0
-RUN wget --no-check-certificate https://mirrors.edge.kernel.org/pub/software/scm/git/git-${gitVer}.tar.gz
-RUN tar -xvzf git-${gitVer}.tar.gz
-WORKDIR /usr/local/git-${gitVer}
-RUN ./configure --with-openssl=/usr/local/openssl
-RUN make -j4
-RUN make install
-RUN git --version
-RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
-
-# Build new enough curl in order to talk https
-WORKDIR /usr/local
-ARG bootstrapCurlVer=7.46.0
-RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
-RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
-WORKDIR /usr/local/curl-${bootstrapCurlVer}
-RUN LIBS="-ldl" ./configure --disable-shared
-RUN make -j4
-RUN make install
-RUN curl --version
-RUN rm -rf /usr/local/curl-${bootstrapCurlVer}.tar.gz curl-${bootstrapCurlVer}
 
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
@@ -71,10 +80,22 @@ RUN curl --version
 RUN rm -rf /usr/local/curl-${curlVer}.tar.gz curl-${curlVer}
 
 # Download the latest .pem file for https connections via curl
-RUN /usr/local/curl/src/curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
+RUN curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
 # Tell git to use the new certs
 RUN echo "[http]" >> ~/.gitconfig
 RUN echo "sslCAinfo = /cacert.pem" >> ~/.gitconfig
+
+# Build new Git
+WORKDIR /usr/local
+ARG gitVer=2.30.0
+RUN wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-${gitVer}.tar.gz
+RUN tar -xvzf git-${gitVer}.tar.gz
+WORKDIR /usr/local/git-${gitVer}
+RUN ./configure --with-openssl=/usr/local/openssl
+RUN make -j4
+RUN make install
+RUN git --version
+RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
 # Spawn shell
 WORKDIR /
