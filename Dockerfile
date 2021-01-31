@@ -25,7 +25,7 @@ RUN python -c "assert open('openssl.sha1').read().strip() in open('openssl.tar.g
 RUN rm openssl.sha1 openssl.tar.gz.calc.sha1
 # Continue with OpenSSL
 RUN tar -xvzf openssl-${bootstrapOpensslVer}.tar.gz
-WORKDIR /usr/local/build
+WORKDIR /usr/local/openssl-${bootstrapOpensslVer}
 RUN ./config --prefix=/usr/local/openssl-bootstrap --openssldir=/usr/local/openssl-bootstrap shared zlib
 RUN make -j4
 RUN make install
