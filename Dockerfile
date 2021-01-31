@@ -13,6 +13,7 @@ RUN apt-get install checkinstall libgnutls-dev curl autoconf libtool -y
 # Upgrade everything
 RUN apt-get dist-upgrade -y
 
+
 # Build not-so-new OpenSSL in order to build not-so-new curl with TLSv1.2 support
 WORKDIR /usr/local
 ARG bootstrapOpensslVer=1.0.1u
@@ -32,10 +33,12 @@ RUN make install
 RUN echo "/usr/local/openssl-bootstrap/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
 RUN /usr/local/openssl-bootstrap/bin/openssl version
-RUN rm -rf /usr/local/openssl-${bootstrapOpensslVer}.tar.gz /usr/local/openssl-${bootstrapOpensslVer}
+
+WORKDIR /usr/local
+RUN rm -rf openssl-${bootstrapOpensslVer}.tar.gz openssl-${bootstrapOpensslVer}
+
 
 # Build not-so-new curl in order to talk TLSv1.2
-WORKDIR /usr/local
 ARG bootstrapCurlVer=7.46.0
 # FIXME: Find a more trustable mirror
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
@@ -45,10 +48,12 @@ RUN LIBS="-ldl" ./configure --prefix=/usr --with-ssl=/usr/local/openssl-bootstra
 RUN make -j4
 RUN make install
 RUN curl --version
-RUN rm -rf /usr/local/curl-${bootstrapCurlVer}.tar.gz /usr/local/curl-${bootstrapCurlVer}
+
+WORKDIR /usr/local
+RUN rm -rf curl-${bootstrapCurlVer}.tar.gz curl-${bootstrapCurlVer}
+
 
 # Build new OpenSSL (needed for newer git and https to work)
-WORKDIR /usr/local
 ARG opensslVer=1.1.1i
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz.sha1 -O openssl.sha1
@@ -63,10 +68,12 @@ WORKDIR /usr/local/openssl-${opensslVer}
 RUN ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
 RUN make -j4
 RUN make install
-RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslVer}
+
+WORKDIR /usr/local
+RUN rm -rf openssl-${opensslVer}.tar.gz openssl-${opensslVer}
+
 
 # Build new curl with new OpenSSL for Git
-WORKDIR /usr/local
 ARG curlVer=7.74.0
 RUN curl -o curl-${curlVer}.tar.gz https://curl.se/download/curl-${curlVer}.tar.gz
 # Pause to adjust OpenSSL
@@ -95,11 +102,14 @@ RUN ./configure --with-openssl=/usr/local/openssl
 RUN make -j4
 RUN make install
 RUN git --version
-RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
+
+WORKDIR /usr/local
+RUN rm -rf git-${gitVer}.tar.gz git-${gitVer}
 
 # Tell git to use the new certs
 RUN echo "[http]" >> ~/.gitconfig
 RUN echo "sslCAinfo = /cacert.pem" >> ~/.gitconfig
+
 
 # Spawn shell
 WORKDIR /
