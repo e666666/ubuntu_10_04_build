@@ -28,7 +28,7 @@ RUN tar -xvzf openssl-${bootstrapOpensslVer}.tar.gz
 WORKDIR /usr/local/openssl-${bootstrapOpensslVer}
 RUN ./config --prefix=/usr/local/openssl-${bootstrapOpensslVer} --openssldir=/usr/local/openssl-${bootstrapOpensslVer} shared zlib
 RUN make -j4
-RUN make install
+RUN make install -j1
 RUN echo "/usr/local/openssl-${bootstrapOpensslVer}/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
 RUN /usr/local/openssl-${bootstrapOpensslVer}/bin/openssl version
