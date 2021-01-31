@@ -44,13 +44,12 @@ RUN ./configure --with-openssl=/usr/local/openssl
 RUN make -j4
 RUN make install
 RUN git --version
-RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /etc/ssh/ssh_config
 RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
-ARG curlVer=7_74_0
-RUN wget https://github.com/curl/curl/archive/curl-${curlVer}.tar.gz
+ARG curlVer=7.74.0
+RUN wget https://curl.haxx.se/download/curl-${curlVer}.tar.gz
 RUN tar -zxvf curl-${curlVer}.tar.gz
 WORKDIR /usr/local/curl-${curlVer}
 RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl --disable-shared
