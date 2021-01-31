@@ -37,7 +37,7 @@ RUN rm -rf /usr/local/openssl-${bootstrapOpensslVer}.tar.gz /usr/local/openssl-$
 # Build not-so-new curl in order to talk TLSv1.2
 WORKDIR /usr/local
 ARG bootstrapCurlVer=7.46.0
-# FIXME: Find a more trustable
+# FIXME: Find a more trustable mirror
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
 RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
 WORKDIR /usr/local/curl-${bootstrapCurlVer}
