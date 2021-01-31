@@ -19,8 +19,10 @@ ARG opensslVer=1.1.1i
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz
 RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz.sha1 -O openssl.sha1
 RUN sha1sum openssl-${opensslVer}.tar.gz > openssl.tar.gz.calc.sha1
-# verify SHA1
+# Verify SHA1
 RUN python -c "assert open('openssl.sha1').read().strip() in open('openssl.tar.gz.calc.sha1').read().strip()"
+# Remove SHA1 files
+RUN rm openssl.sha1 openssl.tar.gz.calc.sha1
 # Continue with OpenSSL
 RUN tar -xvzf openssl-${opensslVer}.tar.gz
 WORKDIR /usr/local/openssl-${opensslVer}
@@ -47,18 +49,15 @@ RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
-# Allow TLSv1
-RUN git config --global --add http.sslVersion tlsv1.2
-# Is the commit id below safe enough to say SSL_NO_VERIFY is ok?
-RUN GIT_SSL_NO_VERIFY=true git clone https://github.com/curl/curl.git
-WORKDIR /usr/local/curl
-RUN git checkout 432eb5f5c254ee8383b2522ce597c9219877923e
-RUN ./buildconf
+ARG curlVer=7_74_0
+RUN wget https://github.com/curl/curl/archive/curl-${curlVer}.tar.gz
+RUN tar -zxvf curl-${curlVer}.tar.gz
+WORKDIR /usr/local/curl-${curlVer}
 RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl --disable-shared
 RUN make -j4
 RUN make install
 RUN curl --version
-RUN rm -rf /usr/local/curl
+RUN rm -rf /usr/local/curl-${curlVer}.tar.gz curl-${curlVer}
 
 # Download the latest .pem file for https connections via curl
 RUN /usr/local/curl/src/curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
