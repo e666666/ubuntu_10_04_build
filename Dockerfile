@@ -67,7 +67,7 @@ RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslV
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
 ARG curlVer=7.74.0
-RUN curl https://curl.se/download/curl-${curlVer}.tar.gz
+RUN curl -o curl-${curlVer}.tar.gz https://curl.se/download/curl-${curlVer}.tar.gz
 # Pause to adjust OpenSSL
 RUN echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
