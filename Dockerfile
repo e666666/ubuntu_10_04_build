@@ -33,16 +33,17 @@ RUN /usr/local/openssl/bin/openssl version
 RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslVer}
 
 # Build new Git
+ARG gitVer=2.30.0
 WORKDIR /usr/local
-RUN wget --no-check-certificate https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
-RUN tar -xvzf git-2.9.5.tar.gz
-WORKDIR /usr/local/git-2.9.5
+RUN wget --no-check-certificate https://mirrors.edge.kernel.org/pub/software/scm/git/git-${gitVer}.tar.gz
+RUN tar -xvzf git-${gitVer}.tar.gz
+WORKDIR /usr/local/git-${gitVer}
 RUN ./configure --with-openssl=/usr/local/openssl
 RUN make -j4
 RUN make install
 RUN git --version
 RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /etc/ssh/ssh_config
-RUN rm -rf /usr/local/git-2.9.5.tar.gz /usr/local/git-2.9.5
+RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
