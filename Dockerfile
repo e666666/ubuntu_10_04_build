@@ -93,9 +93,9 @@ RUN (cd x86_64-linux-glibc2.11-4.6 && cp -a build-lucid-multilib-toolchain.sh to
 # Download and build GCC
 WORKDIR /wd
 # Patches to make stuff work and also ease debugging
-COPY buildScript-specifyBuildTask.patch /buildScript-specifyBuildTask.patch
+COPY patches/buildScript-specifyBuildTask.patch /buildScript-specifyBuildTask.patch
 RUN patch -i ../buildScript-specifyBuildTask.patch
-COPY buildScript-fixVerboseBuild.patch /buildScript-fixVerboseBuild.patch
+COPY patches/buildScript-fixVerboseBuild.patch /buildScript-fixVerboseBuild.patch
 RUN patch -i ../buildScript-fixVerboseBuild.patch
 
 # Build dat thing
