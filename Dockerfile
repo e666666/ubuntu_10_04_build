@@ -46,6 +46,18 @@ RUN make install
 RUN git --version
 RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
+# Download new enough curl in order to talk https
+WORKDIR /usr/local
+ARG bootstrapCurlVer=7.46.0
+RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
+RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
+WORKDIR /usr/local/curl-${bootstrapCurlVer}
+RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl --disable-shared
+RUN make -j4
+RUN make install
+RUN curl --version
+RUN rm -rf /usr/local/curl-${bootstrapCurlVer}.tar.gz curl-${bootstrapCurlVer}
+
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
 ARG curlVer=7.74.0
