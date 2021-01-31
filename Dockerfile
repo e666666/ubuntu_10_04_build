@@ -47,6 +47,8 @@ RUN rm -rf /usr/local/git-${gitVer}.tar.gz /usr/local/git-${gitVer}
 
 # Build new curl with new OpenSSL for Git
 WORKDIR /usr/local
+# Allow TLSv1
+RUN git config --global --add http.sslVersion tlsv1.2
 # Is the commit id below safe enough to say SSL_NO_VERIFY is ok?
 RUN GIT_SSL_NO_VERIFY=true git clone https://github.com/curl/curl.git
 WORKDIR /usr/local/curl
