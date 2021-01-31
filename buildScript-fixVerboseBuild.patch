@@ -1,0 +1,11 @@
+--- build-lucid-multilib-toolchain.sh.orig	2021-01-31 16:23:38.390332667 +0800
++++ build-lucid-multilib-toolchain.sh	2021-01-31 16:24:31.649691023 +0800
+@@ -461,7 +461,7 @@
+ if [ "$VERBOSE" -ge 1 ] ; then
+     run () {
+         echo "## COMMAND: $@"
+-        $@
++        "$@"
+     }
+     log () {
+         echo "$@"

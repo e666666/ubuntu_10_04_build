@@ -1,0 +1,27 @@
+--- build-lucid-multilib-toolchain.sh.orig	2021-01-31 15:05:52.327598839 +0800
++++ build-lucid-multilib-toolchain.sh	2021-01-31 15:35:58.084750322 +0800
+@@ -241,10 +241,13 @@
+ PARAMETERS=
+ FORCE_32=
+ LIST_TASKS=
++TASK=
+ 
+ for opt do
+   optarg=$(expr "x$opt" : 'x[^=]*=\(.*\)')
+   case $opt in
++  --task=*) TASK=$optarg
++  ;;
+   --help|-h|-\?) OPTION_HELP=yes
+   ;;
+   --verbose) VERBOSE=$(( $VERBOSE + 1 ))
+@@ -1777,7 +1780,9 @@
+ # Make sure that the second toolchain depends on the first one
+ task_depends configure_binutils_2 install_gcc_1
+ 
+-if [ "$ONLY_SYSROOT" = "yes" ]; then
++if [ ! -z "$TASK" ]; then
++    MAIN_TASK=$TASK
++elif [ "$ONLY_SYSROOT" = "yes" ]; then
+     MAIN_TASK=copy_sysroot
+     COMPLETION_TEXT="Done, see sysroot files in $(sysroot_dir)"
+ elif [ -n "$PREFIX_DIR" ]; then
