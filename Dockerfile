@@ -41,7 +41,7 @@ ARG bootstrapCurlVer=7.46.0
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
 RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
 WORKDIR /usr/local/curl-${bootstrapCurlVer}
-RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl-bootstrap --disable-shared
+RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl-bootstrap --enable-shared
 RUN make -j4
 RUN make install
 RUN curl --version
@@ -74,10 +74,9 @@ RUN echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
 RUN /usr/local/openssl/bin/openssl version
 RUN rm -rf /usr/local/openssl-bootstrap
-RUN rm /usr/local/lib/libcurl.a
 RUN tar -zxvf curl-${curlVer}.tar.gz
 WORKDIR /usr/local/curl-${curlVer}
-RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl --disable-shared
+RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl --enable-shared
 RUN make -j4
 RUN make install
 RUN curl --version
