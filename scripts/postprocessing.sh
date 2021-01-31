@@ -11,3 +11,6 @@ docker run --rm --entrypoint cat x86_64-linux-glibc2.11-4.6 /usr/lib32/libxcb.so
 ln -sv libxcb.so.1.1.0 sysroot/usr/lib32/libxcb.so.1
 
 # Update headers
+patch -p1 -i ../patches/Update-headers.patch
+
+popd
