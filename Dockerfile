@@ -17,7 +17,8 @@ RUN wget https://www.openssl.org/source/openssl-${bootstrapOpensslVer}.tar.gz
 RUN tar -xvzf openssl-${bootstrapOpensslVer}.tar.gz
 WORKDIR /usr/local/openssl-${bootstrapOpensslVer}
 RUN ./config --prefix=/usr/local/openssl-bootstrap --openssldir=/usr/local/openssl-bootstrap shared zlib
-RUN make install -j6
+RUN make -j6
+RUN make install
 RUN echo "/usr/local/openssl-bootstrap/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
 RUN /usr/local/openssl-bootstrap/bin/openssl version
@@ -29,7 +30,8 @@ RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/c
 RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
 WORKDIR /usr/local/curl-${bootstrapCurlVer}
 RUN LIBS="-ldl" ./configure --prefix=/usr --with-ssl=/usr/local/openssl-bootstrap --enable-shared
-RUN make install -j6
+RUN make -j6
+RUN make install
 RUN curl --version
 
 # Build new OpenSSL (needed for newer git and https to work)
@@ -38,7 +40,8 @@ RUN wget https://www.openssl.org/source/openssl-${opensslVer}.tar.gz
 RUN tar -xvzf openssl-${opensslVer}.tar.gz
 WORKDIR /usr/local/openssl-${opensslVer}
 RUN ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
-RUN make install -j6
+RUN make -j6
+RUN make install
 
 # Build new curl with new OpenSSL for Git
 ARG curlVer=7.74.0
@@ -54,7 +57,8 @@ RUN rm -rf /usr/local/openssl-bootstrap
 RUN tar -zxvf curl-${curlVer}.tar.gz
 WORKDIR /usr/local/curl-${curlVer}
 RUN LIBS="-ldl" ./configure --prefix=/usr --with-ssl=/usr/local/openssl --enable-shared
-RUN make install -j6
+RUN make -j6
+RUN make install
 RUN curl --version
 
 # Download the latest .pem file for https connections via curl
@@ -68,7 +72,8 @@ RUN curl --cacert /cacert.pem -o git-${gitVer}.tar.gz https://mirrors.edge.kerne
 RUN tar -xvzf git-${gitVer}.tar.gz
 WORKDIR /usr/local/git-${gitVer}
 RUN ./configure --with-openssl=/usr/local/openssl
-RUN make install -j6
+RUN make -j6
+RUN make install
 RUN git --version
 
 # Tell git to use the new certs
