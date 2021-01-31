@@ -62,8 +62,6 @@ WORKDIR /usr/local/openssl-${opensslVer}
 RUN ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib
 RUN make -j4
 RUN make install
-RUN ldconfig -v
-RUN /usr/local/openssl/bin/openssl version
 RUN rm -rf /usr/local/openssl-${opensslVer}.tar.gz /usr/local/openssl-${opensslVer}
 
 # Build new curl with new OpenSSL for Git
@@ -72,6 +70,8 @@ ARG curlVer=7.74.0
 RUN curl https://curl.se/download/curl-${curlVer}.tar.gz
 # Pause to adjust OpenSSL
 RUN echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
+RUN ldconfig -v
+RUN /usr/local/openssl/bin/openssl version
 RUN rm -rf /usr/local/openssl-bootstrap
 RUN tar -zxvf curl-${curlVer}.tar.gz
 WORKDIR /usr/local/curl-${curlVer}
