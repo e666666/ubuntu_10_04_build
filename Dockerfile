@@ -92,6 +92,7 @@ RUN rm -rf /usr/local/curl-${curlVer}.tar.gz /usr/local/curl-${curlVer}
 # Download the latest .pem file for https connections via curl
 RUN curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
 
+
 # Build new Git
 WORKDIR /usr/local
 ARG gitVer=2.30.0
