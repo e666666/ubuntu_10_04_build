@@ -52,7 +52,7 @@ ARG bootstrapCurlVer=7.46.0
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
 RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
 WORKDIR /usr/local/curl-${bootstrapCurlVer}
-RUN LIBS="-ldl" ./configure --with-ssl=/usr/local/openssl --disable-shared
+RUN LIBS="-ldl" ./configure --disable-shared
 RUN make -j4
 RUN make install
 RUN curl --version
