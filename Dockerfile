@@ -10,6 +10,8 @@ RUN apt-get install tar wget gcc g++ make nano libc6-dev-i386 python-pip python-
 RUN apt-get install python-argparse build-essential ia32-libs gcc-multilib g++-multilib -y
 RUN apt-get install git-core python libcurl4-openssl-dev libz-dev gettext zlib1g-dev -y
 RUN apt-get install checkinstall libgnutls-dev curl autoconf libtool -y
+# Upgrade everything
+RUN apt-get dist-upgrade -y
 
 # Build new OpenSSL (needed for newer git and https to work)
 WORKDIR /usr/local
@@ -59,10 +61,6 @@ RUN /usr/local/curl/src/curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
 # Tell git to use the new certs
 RUN echo "[http]" >> ~/.gitconfig
 RUN echo "sslCAinfo = /cacert.pem" >> ~/.gitconfig
-
-# Upgrade everything
-RUN apt-get update
-RUN apt-get dist-upgrade -y
 
 # Spawn shell
 WORKDIR /
