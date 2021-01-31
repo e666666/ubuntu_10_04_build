@@ -25,14 +25,13 @@ RUN python -c "assert open('openssl.sha1').read().strip() in open('openssl.tar.g
 RUN rm openssl.sha1 openssl.tar.gz.calc.sha1
 # Continue with OpenSSL
 RUN tar -xvzf openssl-${bootstrapOpensslVer}.tar.gz
-RUN mv openssl-${bootstrapOpensslVer} build
 WORKDIR /usr/local/build
-RUN ./config --prefix=/usr/local/openssl-${bootstrapOpensslVer} --openssldir=/usr/local/openssl-${bootstrapOpensslVer} shared zlib
+RUN ./config --prefix=/usr/local/openssl-bootstrap --openssldir=/usr/local/openssl-bootstrap shared zlib
 RUN make -j4
 RUN make install
-RUN echo "/usr/local/openssl-${bootstrapOpensslVer}/lib" > /etc/ld.so.conf.d/openssl.conf
+RUN echo "/usr/local/openssl-bootstrap/lib" > /etc/ld.so.conf.d/openssl.conf
 RUN ldconfig -v
-RUN /usr/local/openssl-${bootstrapOpensslVer}/bin/openssl version
+RUN /usr/local/openssl-bootstrap/bin/openssl version
 RUN rm -rf /usr/local/openssl-${bootstrapOpensslVer}.tar.gz /usr/local/openssl-${bootstrapOpensslVer}
 
 # Build not-so-new curl in order to talk TLSv1.2
@@ -41,7 +40,7 @@ ARG bootstrapCurlVer=7.46.0
 RUN wget ftp://ftp.sunet.se/mirror/archive/ftp.sunet.se/pub/www/utilities/curl/curl-${bootstrapCurlVer}.tar.gz
 RUN tar -zxvf curl-${bootstrapCurlVer}.tar.gz
 WORKDIR /usr/local/curl-${bootstrapCurlVer}
-RUN LIBS="-ldl" ./configure --with-openssl=/usr/local/openssl-${bootstrapOpensslVer} --disable-shared
+RUN LIBS="-ldl" ./configure --with-openssl=/usr/local/openssl-bootstrap --disable-shared
 RUN make -j4
 RUN make install
 RUN curl --version
