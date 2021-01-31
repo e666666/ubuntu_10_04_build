@@ -45,7 +45,7 @@ RUN LIBS="-ldl" ./configure --prefix=/usr --with-ssl=/usr/local/openssl-bootstra
 RUN make -j4
 RUN make install
 RUN curl --version
-RUN rm -rf /usr/local/curl-${bootstrapCurlVer}.tar.gz curl-${bootstrapCurlVer}
+RUN rm -rf /usr/local/curl-${bootstrapCurlVer}.tar.gz /usr/local/curl-${bootstrapCurlVer}
 
 # Build new OpenSSL (needed for newer git and https to work)
 WORKDIR /usr/local
@@ -80,7 +80,7 @@ RUN LIBS="-ldl" ./configure --prefix=/usr --with-ssl=/usr/local/openssl --enable
 RUN make -j4
 RUN make install
 RUN curl --version
-RUN rm -rf /usr/local/curl-${curlVer}.tar.gz curl-${curlVer}
+RUN rm -rf /usr/local/curl-${curlVer}.tar.gz /usr/local/curl-${curlVer}
 
 # Download the latest .pem file for https connections via curl
 RUN curl https://curl.haxx.se/ca/cacert.pem -o /cacert.pem
