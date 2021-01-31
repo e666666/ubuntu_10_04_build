@@ -31,7 +31,7 @@ RUN /usr/local/openssl/bin/openssl version
 
 # Build new Git
 WORKDIR /usr/local
-RUN wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
+RUN wget --no-check-certificate https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.9.5.tar.gz
 RUN tar -xvzf git-2.9.5.tar.gz
 WORKDIR /usr/local/git-2.9.5
 RUN ./configure --with-openssl=/usr/local/openssl
@@ -61,16 +61,20 @@ RUN echo "[http]" >> ~/.gitconfig
 RUN echo "sslCAinfo = /cacert.pem" >> ~/.gitconfig
 
 # Build GCC-8.2
-WORKDIR /usr/local
-RUN git clone https://github.com/csm10495/ginst.git
-WORKDIR /usr/local/ginst
-RUN git checkout 20e10834c3beed90bf90a6c2ae2a6d89d2754f0f
-RUN python -c "from ginst import *; g = GInst('8.2.0');g.install()"
+# WORKDIR /usr/local
+# RUN git clone https://github.com/csm10495/ginst.git
+# WORKDIR /usr/local/ginst
+# RUN git checkout 20e10834c3beed90bf90a6c2ae2a6d89d2754f0f
+# RUN python -c "from ginst import *; g = GInst('8.2.0');g.install()"
 # TODO CLEANUP
 
 # Force our terminal to use this GCC 8.2 instead of the default
-RUN echo "alias g++=/usr/local/gcc-8.2.0/bin/g++-8.2.0" >> ~/.bashrc
-RUN echo "alias gcc=/usr/local/gcc-8.2.0/bin/gcc-8.2.0" >> ~/.bashrc
+# RUN echo "alias g++=/usr/local/gcc-8.2.0/bin/g++-8.2.0" >> ~/.bashrc
+# RUN echo "alias gcc=/usr/local/gcc-8.2.0/bin/gcc-8.2.0" >> ~/.bashrc
+
+# Upgrade everything
+RUN apt-get update
+RUN apt-get dist-upgrade -y
 
 # Let's go!
 WORKDIR /
